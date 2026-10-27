@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SHA-512 Cryptographic Hash Function | Cryptography Mini Project</title>
+  <meta name="description" content="A complete educational implementation and interactive demonstration of the NIST FIPS PUB 180-4 SHA-512 Cryptographic Hash Function using pure Vanilla JavaScript and 64-bit BigInt arithmetic.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ==============================================================================
+       HEADER & NAVIGATION
+       ============================================================================== -->
+  <header class="header-banner">
+    <div class="container">
+      <div class="header-inner">
+        <a href="#hero" class="logo-group">
+          <div class="logo-icon">🔒</div>
+          <div class="logo-text">
+            <h1>SHA-512</h1>
+            <span>Cryptography Mini Project</span>
+          </div>
+        </a>
+        <nav>
+          <ul class="nav-links">
+            <li><a href="#generator" class="nav-link active">Generator</a></li>
+            <li><a href="#verification" class="nav-link">Verification</a></li>
+            <li><a href="#avalanche" class="nav-link">Avalanche Effect</a></li>
+            <li><a href="#about" class="nav-link">About SHA-512</a></li>
+            <li><a href="#how-it-works" class="nav-link">How It Works</a></li>
+            <li><a href="#algorithm-details" class="nav-link">Algorithm Details</a></li>
+            <li><a href="#standard-verification" class="nav-link">Web Crypto Check</a></li>
+            <li><a href="#test-vectors" class="nav-link">Test Vectors</a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- ==============================================================================
+       HERO SECTION
+       ============================================================================== -->
+  <section id="hero" class="hero">
+    <div class="container">
+      <div class="hero-badge">🎓 College Cryptography & Network Security Project</div>
+      <h1 class="hero-title">SHA-512 HASH FUNCTION</h1>
+      <p class="hero-subtitle">Cryptography Mini Project</p>
+      <p class="hero-description">
+        Implementation and demonstration of the SHA-512 cryptographic hash function.
+        Built with 100% pure Vanilla JavaScript using 64-bit BigInt arithmetic modulo 2<sup>64</sup> according to NIST FIPS PUB 180-4 &amp; RFC 6234.
+      </p>
+      <div class="hero-tags">
+        <span class="tag-pill">NIST FIPS 180-4</span>
+        <span class="tag-pill">RFC 6234</span>
+        <span class="tag-pill">1024-bit Block Size</span>
+        <span class="tag-pill">512-bit Digest (128 Hex Chars)</span>
+        <span class="tag-pill">80 Compression Rounds</span>
+        <span class="tag-pill">Zero Frameworks / 100% Local</span>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- ==============================================================================
+         SECTION 1: SHA-512 HASH GENERATOR
+         ============================================================================== -->
+    <section id="generator" class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">⚡</div>
+          <div>
+            <h2 class="section-title">SHA-512 Hash Generator</h2>
+            <p class="section-subtitle">Generate a 512-bit cryptographic hash from any text input</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">SHA-512 Hash Generator</h3>
+        <p class="card-description">
+          Enter any message or text below. The hash is computed entirely on your device using our manual 64-bit BigInt SHA-512 engine.
+        </p>
+
+        <div class="form-group">
+          <div class="form-label">
+            <span>Input Message</span>
+            <span id="gen-char-count" class="form-label-info">0 characters | 0 bytes</span>
+          </div>
+          <textarea id="gen-input" class="textarea-custom" rows="4" placeholder="Enter your message here..."></textarea>
+          
+          <div class="preset-pills">
+            <span class="preset-label">Quick Presets:</span>
+            <button type="button" class="preset-pill" onclick="setGeneratorInput('')">Empty String</button>
+            <button type="button" class="preset-pill" onclick="setGeneratorInput('abc')">"abc"</button>
+            <button type="button" class="preset-pill" onclick="setGeneratorInput('Hello')">"Hello"</button>
+            <button type="button" class="preset-pill" onclick="setGeneratorInput('Hello World')">"Hello World"</button>
+            <button type="button" class="preset-pill" onclick="setGeneratorInput('The quick brown fox jumps over the lazy dog')">Quick Brown Fox</button>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button id="btn-generate" class="btn btn-primary" type="button">
+            <span>⚡</span> Generate Hash
+          </button>
+          <button id="btn-clear-gen" class="btn btn-secondary" type="button">
+            <span>🧹</span> Clear
+          </button>
+          <button id="btn-copy-gen" class="btn btn-accent" type="button">
+            <span>📋</span> Copy Hash
+          </button>
+          <button id="btn-toggle-steps" class="btn btn-secondary btn-sm" type="button" style="margin-left: auto;">
+            <span>🔍</span> Step-by-Step Details
+          </button>
+        </div>
+
+        <!-- Generated Output Box -->
+        <div class="output-container">
+          <div class="output-header">
+            <span class="output-title">🔒 SHA-512 Hash</span>
+            <span class="output-meta">Hash Length: <strong id="gen-hash-len">128</strong> hexadecimal characters (512 bits)</span>
+          </div>
+          <div id="gen-output-hash" class="output-box">
+            cf83e1357eefb8bdf1542850d66d8007d620e4050b5715dc83f4a921d36ce9ce47d0d13c5d85f2b0ff8318d2877eec2f63b931bd47417a81a538327af927da3e
+          </div>
+          <div class="output-footer">
+            <span>Computed by: <strong>sha512.js</strong> (Manual BigInt Engine)</span>
+            <span id="gen-exec-time">Execution: &lt;1 ms</span>
+          </div>
+        </div>
+
+        <!-- Step-by-Step Educational Breakdown (Expandable) -->
+        <div id="gen-steps-panel" style="display: none; margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--border-color);">
+          <h4 style="color: var(--accent-cyan); margin-bottom: 0.75rem; font-size: 0.95rem;">🔬 Internal Execution Breakdown</h4>
+          <div id="gen-steps-content" style="font-size: 0.85rem; color: var(--text-secondary);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         SECTION 2: HASH VERIFICATION
+         ============================================================================== -->
+    <section id="verification" class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">🔍</div>
+          <div>
+            <h2 class="section-title">Hash Verification</h2>
+            <p class="section-subtitle">Verify data integrity by matching a message against a known 128-character SHA-512 hash</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Hash Verification</h3>
+        <p class="card-description">
+          Enter an input message and the expected 128-character SHA-512 hash. The system recalculates the hash and verifies exact cryptographic integrity (case-insensitive).
+        </p>
+
+        <div class="form-group">
+          <label class="form-label" for="verify-message">Message:</label>
+          <textarea id="verify-message" class="textarea-custom" rows="3" placeholder="Enter message to verify..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <div class="form-label">
+            <label for="verify-expected-hash">Expected SHA-512 Hash:</label>
+            <button type="button" class="preset-pill" onclick="pasteLastGeneratedToVerify()">Paste Generated Hash</button>
+          </div>
+          <input type="text" id="verify-expected-hash" class="input-custom input-mono" placeholder="Enter 128-character hash (e.g. ddaf35a193617abacc41...)" maxlength="128">
+          <span id="verify-hash-char-count" class="form-label-info" style="display: block; margin-top: 0.35rem;">Length: 0 / 128 characters</span>
+        </div>
+
+        <div class="btn-row">
+          <button id="btn-verify" class="btn btn-primary" type="button">
+            <span>🔍</span> Verify Hash
+          </button>
+          <button id="btn-clear-verify" class="btn btn-secondary" type="button">
+            <span>🧹</span> Clear Fields
+          </button>
+        </div>
+
+        <!-- Verification Result Status Display -->
+        <div id="verify-status-box" class="verification-status">
+          <div id="verify-status-title" class="status-badge"></div>
+          <p id="verify-status-desc" class="status-detail"></p>
+          <div id="verify-comparison-details" style="margin-top: 0.75rem; font-family: var(--font-mono); font-size: 0.8rem; word-break: break-all;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         SECTION 3: AVALANCHE EFFECT
+         ============================================================================== -->
+    <section id="avalanche" class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">💥</div>
+          <div>
+            <h2 class="section-title">Avalanche Effect Demonstration</h2>
+            <p class="section-subtitle">Demonstrating cryptographic diffusion: how a tiny 1-bit input change flips ~50% of the entire hash</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Avalanche Effect Demonstration</h3>
+        <p class="card-description">
+          A fundamental security property of cryptographic hash functions is the <strong>Avalanche Effect</strong> (Strict Avalanche Criterion). Even a tiny 1-character or 1-bit variation in the input creates a completely different, uncorrelated digest.
+        </p>
+
+        <div class="avalanche-grid">
+          <div class="form-group">
+            <div class="form-label">
+              <span>Input 1:</span>
+              <button type="button" class="preset-pill" onclick="setAvalanchePreset(1)">Load Example 1</button>
+            </div>
+            <textarea id="avalanche-input-1" class="textarea-custom" rows="3">The quick brown fox jumps over the lazy dog</textarea>
+          </div>
+
+          <div class="form-group">
+            <div class="form-label">
+              <span>Input 2: (Slight Difference)</span>
+              <button type="button" class="preset-pill" onclick="setAvalanchePreset(2)">Load Example 2 (Added Dot)</button>
+            </div>
+            <textarea id="avalanche-input-2" class="textarea-custom" rows="3">The quick brown fox jumps over the lazy dog.</textarea>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button id="btn-compare-avalanche" class="btn btn-primary" type="button">
+            <span>💥</span> Compare Hashes
+          </button>
+          <button type="button" class="preset-pill" onclick="setSingleBitAvalanche()">Test 1-Bit Flip (Password vs password)</button>
+        </div>
+
+        <!-- Metrics Display -->
+        <div class="metric-cards">
+          <div class="metric-card">
+            <div id="diff-hex-count" class="metric-value cyan">121 / 128</div>
+            <div class="metric-label">Different Hex Characters</div>
+          </div>
+          <div class="metric-card">
+            <div id="diff-hex-percent" class="metric-value emerald">94.53%</div>
+            <div class="metric-label">Hex Difference Ratio</div>
+          </div>
+          <div class="metric-card">
+            <div id="diff-bit-count" class="metric-value purple">261 / 512</div>
+            <div class="metric-label">Flipped Bits (Hamming Dist.)</div>
+          </div>
+          <div class="metric-card">
+            <div id="diff-bit-percent" class="metric-value cyan">50.98%</div>
+            <div class="metric-label">Bit Avalanche Ratio (~50% Ideal)</div>
+          </div>
+        </div>
+
+        <!-- Visual Hash Comparison -->
+        <div class="diff-visualizer">
+          <div class="diff-header">
+            <span>Hash 1 (128 Characters):</span>
+            <span id="hash1-preview" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);"></span>
+          </div>
+          <div id="hash1-display" class="output-box" style="margin-bottom: 0.75rem; font-size: 0.8rem; min-height: 50px;"></div>
+
+          <div class="diff-header">
+            <span>Hash 2 (128 Characters):</span>
+            <span id="hash2-preview" style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);"></span>
+          </div>
+          <div id="hash2-display" class="output-box" style="margin-bottom: 0.75rem; font-size: 0.8rem; min-height: 50px;"></div>
+
+          <div class="diff-header">
+            <span>Visual Difference Matrix (Red = Altered Character, Green = Identical Character):</span>
+          </div>
+          <div id="diff-matrix-container" class="diff-matrix"></div>
+        </div>
+
+        <div style="margin-top: 1rem; padding: 0.85rem 1rem; background: rgba(56, 189, 248, 0.08); border-radius: var(--radius-md); border-left: 3px solid var(--accent-cyan); font-size: 0.875rem; color: var(--text-secondary);">
+          💡 <strong>Avalanche Principle:</strong> Even a small change in the input (such as adding a single period or flipping 1 bit) produces a significantly different hash with approximately 50% of the output bits flipping randomly. This ensures that attackers cannot infer input relationships from hash outputs.
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         SECTION 4: SHA-512 INFORMATION
+         ============================================================================== -->
+    <section id="about" class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">📚</div>
+          <div>
+            <h2 class="section-title">About SHA-512</h2>
+            <p class="section-subtitle">Technical specifications, cryptographic properties, and theoretical foundations</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="specs-grid">
+        <div class="spec-item">
+          <div class="spec-name">Algorithm</div>
+          <div class="spec-val accent">SHA-512</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-name">Algorithm Family</div>
+          <div class="spec-val">SHA-2</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-name">Digest Output</div>
+          <div class="spec-val accent">512 bits (64 bytes)</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-name">Hexadecimal Output</div>
+          <div class="spec-val">128 characters</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-name">Block Size</div>
+          <div class="spec-val">1024 bits (128 bytes)</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-name">Word Size</div>
+          <div class="spec-val">64 bits (BigInt)</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-name">Number of Rounds</div>
+          <div class="spec-val accent">80 Rounds</div>
+        </div>
+        <div class="spec-item">
+          <div class="spec-name">Nature</div>
+          <div class="spec-val">One-way Hash Function</div>
+        </div>
+      </div>
+
+      <div class="info-cards-grid">
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-card-icon">#️⃣</div>
+            <h4 class="info-card-title">Cryptographic Hashing</h4>
+          </div>
+          <p class="info-card-body">
+            A deterministic mathematical algorithm that maps arbitrary-length input data to a fixed-size 512-bit digest. The same input always produces the exact same 128-hex-character output.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-card-icon">🛡️</div>
+            <h4 class="info-card-title">One-Way Property (Pre-image Resistance)</h4>
+          </div>
+          <p class="info-card-body">
+            Computationally infeasible to reverse. Given a 512-bit hash digest <em>h</em>, finding any original input message <em>m</em> such that <em>SHA512(m) = h</em> would require on average 2<sup>512</sup> operations.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-card-icon">⚡</div>
+            <h4 class="info-card-title">Collision Resistance</h4>
+          </div>
+          <p class="info-card-body">
+            It is practically impossible to find any two different messages <em>m<sub>1</sub> ≠ m<sub>2</sub></em> such that <em>SHA512(m<sub>1</sub>) = SHA512(m<sub>2</sub>)</em>. Security strength against collisions is 2<sup>256</sup> operations.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-card-icon">🌊</div>
+            <h4 class="info-card-title">Avalanche Effect</h4>
+          </div>
+          <p class="info-card-body">
+            Strict diffusion design guarantees that flipping a single bit in the input message causes an average of 50% of the 512 output bits to flip, preventing correlation and differential attacks.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-card-icon">🧩</div>
+            <h4 class="info-card-title">Message Padding</h4>
+          </div>
+          <p class="info-card-body">
+            Messages are aligned to 1024-bit block boundaries by appending a '1' bit (0x80 byte), required zero padding bytes, and a 128-bit big-endian representation of the original message bit length.
+          </p>
+        </div>
+
+        <div class="info-card">
+          <div class="info-card-header">
+            <div class="info-card-icon">🔄</div>
+            <h4 class="info-card-title">Compression Function</h4>
+          </div>
+          <p class="info-card-body">
+            Utilizes the Davies-Meyer construction with 80 distinct compression rounds, mixing 64-bit non-linear functions (Ch, Maj, Σ, σ) and prime-derived round constants K<sub>0..79</sub> modulo 2<sup>64</sup>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         SECTION 5: HOW SHA-512 WORKS
+         ============================================================================== -->
+    <section id="how-it-works" class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">⚙️</div>
+          <div>
+            <h2 class="section-title">How SHA-512 Works</h2>
+            <p class="section-subtitle">Step-by-step pipeline of the 512-bit message digest generation process</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="pipeline-list">
+          <div class="pipeline-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4 class="step-title">Message Input</h4>
+              <p class="step-desc">The user provides arbitrary text or binary data of length <em>L</em> bits.</p>
+              <div class="step-code">Input: "Hello World" (Length: 11 characters = 88 bits)</div>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4 class="step-title">UTF-8 Encoding</h4>
+              <p class="step-desc">Convert the text string into a sequence of raw byte values (0x00 - 0xFF).</p>
+              <div class="step-code">Bytes: [0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x57, 0x6f, 0x72, 0x6c, 0x64]</div>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <h4 class="step-title">Padding</h4>
+              <p class="step-desc">
+                Append a single '1' bit (byte <code>0x80</code>), followed by <em>k</em> zero bytes so that total length modulo 128 bytes equals 112 bytes (896 bits mod 1024).
+              </p>
+              <div class="step-code">Append 0x80, then 100 zero bytes (0x00 ... 0x00)</div>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <h4 class="step-title">1024-bit Block Formation &amp; Length Append</h4>
+              <p class="step-desc">
+                Append the original message length <em>L</em> as a 128-bit big-endian unsigned integer (16 bytes). The data is now partitioned into 1024-bit (128-byte / sixteen 64-bit words) blocks.
+              </p>
+              <div class="step-code">Length = 88 bits → 0x00000000000000000000000000000058 (16 bytes appended)</div>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+              <h4 class="step-title">Message Schedule W[0..79]</h4>
+              <p class="step-desc">
+                For each 1024-bit block, copy the 16 words into W[0..15], then expand words W[16..79] using the small sigma functions:
+                <code>W[t] = σ1(W[t-2]) + W[t-7] + σ0(W[t-15]) + W[t-16] mod 2^64</code>
+              </p>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-number">6</div>
+            <div class="step-content">
+              <h4 class="step-title">Initialize State Variables H0 - H7</h4>
+              <p class="step-desc">
+                Initialize eight 64-bit working registers (a, b, c, d, e, f, g, h) from fractional parts of square roots of first 8 primes.
+              </p>
+              <div class="step-code">H0 = 0x6a09e667f3bcc908, H1 = 0xbb67ae8584caa73b, ..., H7 = 0x5be0cd19137e2179</div>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-number">7</div>
+            <div class="step-content">
+              <h4 class="step-title">80 Compression Rounds</h4>
+              <p class="step-desc">
+                Iteratively transform registers through 80 rounds using round constants K<sub>0..79</sub>, message words W<sub>0..79</sub>, and logical functions Ch, Maj, Σ0, Σ1.
+              </p>
+              <div class="step-code">T1 = h + Σ1(e) + Ch(e,f,g) + K[t] + W[t]; T2 = Σ0(a) + Maj(a,b,c); a = T1 + T2; e = d + T1;</div>
+            </div>
+          </div>
+
+          <div class="pipeline-step">
+            <div class="step-number">8</div>
+            <div class="step-content">
+              <h4 class="step-title">Final 512-bit Digest</h4>
+              <p class="step-desc">
+                Add round output registers to H0..H7 (modulo 2<sup>64</sup>) and concatenate into a single 512-bit string of 128 hexadecimal digits.
+              </p>
+              <div class="step-code">Output: 128 Hexadecimal Characters (e.g. 2c74fd17edafd80e8447b0d46741ee24...)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         SECTION 6: ALGORITHM DETAILS
+         ============================================================================== -->
+    <section id="algorithm-details" class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">📐</div>
+          <div>
+            <h2 class="section-title">Algorithm Details &amp; Mathematical Functions</h2>
+            <p class="section-subtitle">The six 64-bit bitwise functions and compression round equations</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="math-grid">
+        <div class="math-card">
+          <div class="math-title">
+            <span>Ch(x, y, z)</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Choose Function</span>
+          </div>
+          <div class="math-formula">Ch(x, y, z) = (x ∧ y) ⊕ (¬x ∧ z)</div>
+          <p class="math-explanation">
+            Acts as a bitwise multiplexer: for each bit position, if bit in <em>x</em> is 1, choose bit in <em>y</em>; otherwise choose bit in <em>z</em>.
+          </p>
+        </div>
+
+        <div class="math-card">
+          <div class="math-title">
+            <span>Maj(x, y, z)</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Majority Function</span>
+          </div>
+          <div class="math-formula">Maj(x, y, z) = (x ∧ y) ⊕ (x ∧ z) ⊕ (y ∧ z)</div>
+          <p class="math-explanation">
+            Returns 1 for a bit position if the majority (two or three) of the corresponding bits in <em>x, y, z</em> are 1.
+          </p>
+        </div>
+
+        <div class="math-card">
+          <div class="math-title">
+            <span>Σ0(x) &amp; Σ1(x)</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Big Sigma Functions</span>
+          </div>
+          <div class="math-formula">
+            Σ0(x) = ROTR<sup>28</sup>(x) ⊕ ROTR<sup>34</sup>(x) ⊕ ROTR<sup>39</sup>(x)<br>
+            Σ1(x) = ROTR<sup>14</sup>(x) ⊕ ROTR<sup>18</sup>(x) ⊕ ROTR<sup>41</sup>(x)
+          </div>
+          <p class="math-explanation">
+            Performs multiple 64-bit circular right rotations and XOR combinations to provide intra-word diffusion in compression rounds.
+          </p>
+        </div>
+
+        <div class="math-card">
+          <div class="math-title">
+            <span>σ0(x) &amp; σ1(x)</span>
+            <span style="font-size: 0.75rem; color: var(--text-muted);">Small Sigma Functions</span>
+          </div>
+          <div class="math-formula">
+            σ0(x) = ROTR<sup>1</sup>(x) ⊕ ROTR<sup>8</sup>(x) ⊕ SHR<sup>7</sup>(x)<br>
+            σ1(x) = ROTR<sup>19</sup>(x) ⊕ ROTR<sup>61</sup>(x) ⊕ SHR<sup>6</sup>(x)
+          </div>
+          <p class="math-explanation">
+            Used during message expansion to compute schedule words W[16..79]. Combines rotations with logical right shifts.
+          </p>
+        </div>
+
+        <div class="math-card" style="grid-column: 1 / -1;">
+          <div class="math-title">
+            <span>Round Compression Formulas (Modulo 2<sup>64</sup>)</span>
+          </div>
+          <div class="math-formula" style="font-size: 0.9rem;">
+            T1 = (h + Σ1(e) + Ch(e, f, g) + K<sub>t</sub> + W<sub>t</sub>) mod 2<sup>64</sup><br>
+            T2 = (Σ0(a) + Maj(a, b, c)) mod 2<sup>64</sup><br>
+            h = g; &nbsp; g = f; &nbsp; f = e; &nbsp; e = (d + T1) mod 2<sup>64</sup>; &nbsp; d = c; &nbsp; c = b; &nbsp; b = a; &nbsp; a = (T1 + T2) mod 2<sup>64</sup>
+          </div>
+          <p class="math-explanation">
+            Each round injects one 64-bit round constant K<sub>t</sub> and one message word W<sub>t</sub> into the working state, rotating all variables and mixing non-linear functions into registers <em>a</em> and <em>e</em>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Live Function Tester Playground -->
+      <div class="playground-box">
+        <h4 style="color: var(--accent-cyan); margin-bottom: 0.5rem; font-size: 1rem;">🧪 Interactive 64-bit Function Tester</h4>
+        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+          Test any 64-bit hexadecimal words to see live computation of SHA-512 non-linear primitives.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+          <div>
+            <label class="form-label">Word X (Hex):</label>
+            <input type="text" id="play-x" class="input-custom input-mono" value="6a09e667f3bcc908" maxlength="16">
+          </div>
+          <div>
+            <label class="form-label">Word Y (Hex):</label>
+            <input type="text" id="play-y" class="input-custom input-mono" value="bb67ae8584caa73b" maxlength="16">
+          </div>
+          <div>
+            <label class="form-label">Word Z (Hex):</label>
+            <input type="text" id="play-z" class="input-custom input-mono" value="3c6ef372fe94f82b" maxlength="16">
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
+          <div style="background: #060910; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Ch(X, Y, Z):</div>
+            <div id="play-res-ch" style="font-family: var(--font-mono); color: var(--accent-cyan); font-weight: 700;">-</div>
+          </div>
+          <div style="background: #060910; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Maj(X, Y, Z):</div>
+            <div id="play-res-maj" style="font-family: var(--font-mono); color: var(--accent-cyan); font-weight: 700;">-</div>
+          </div>
+          <div style="background: #060910; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="font-size: 0.75rem; color: var(--text-muted);">Σ0(X):</div>
+            <div id="play-res-sig0" style="font-family: var(--font-mono); color: var(--accent-purple); font-weight: 700;">-</div>
+          </div>
+          <div style="background: #060910; padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+            <div style="font-size: 0.75rem; color: var(--text-muted);">σ0(X):</div>
+            <div id="play-res-ssig0" style="font-family: var(--font-mono); color: var(--accent-purple); font-weight: 700;">-</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         SECTION 7: STANDARD VERIFICATION (VS WEB CRYPTO)
+         ============================================================================== -->
+    <section id="standard-verification" class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">🛡️</div>
+          <div>
+            <h2 class="section-title">Implementation Verification</h2>
+            <p class="section-subtitle">Benchmarking our manual implementation against browser's native Web Crypto API</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Implementation Verification</h3>
+        <p class="card-description">
+          To mathematically prove that our manual SHA-512 engine (in <code>sha512.js</code>) is 100% compliant with the NIST standard, this section executes the exact same message through both our manual engine and the browser's native <code>crypto.subtle.digest("SHA-512")</code> API.
+        </p>
+
+        <div style="margin-bottom: 1rem; padding: 0.75rem 1rem; background: rgba(129, 140, 248, 0.1); border-radius: var(--radius-sm); border-left: 3px solid var(--accent-indigo); font-size: 0.85rem; color: var(--text-secondary);">
+          ℹ️ <strong>Academic Note:</strong> <code>crypto.subtle.digest()</code> is used <strong>ONLY as a reference test oracle</strong>. All primary hashing in this project is executed by our custom <code>sha512.js</code> script.
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="std-verify-input">Verification Test Message:</label>
+          <input type="text" id="std-verify-input" class="input-custom" value="Cryptography Project 2026 - Standard Verification Test">
+        </div>
+
+        <div class="btn-row">
+          <button id="btn-run-std-verify" class="btn btn-primary" type="button">
+            <span>🛡️</span> Run Verification Test
+          </button>
+        </div>
+
+        <div class="verification-compare-grid">
+          <div class="compare-col">
+            <div class="compare-header">
+              <span>Our Manual SHA-512</span>
+              <span class="compare-tag tag-manual">sha512.js (BigInt)</span>
+            </div>
+            <div id="std-our-hash" class="compare-hash">Computing...</div>
+          </div>
+
+          <div class="compare-col">
+            <div class="compare-header">
+              <span>Browser Native Web Crypto</span>
+              <span class="compare-tag tag-webcrypto">crypto.subtle.digest</span>
+            </div>
+            <div id="std-ref-hash" class="compare-hash">Computing...</div>
+          </div>
+        </div>
+
+        <div id="std-match-banner" class="match-banner">
+          <span style="font-size: 1.3rem;">✓</span>
+          <div>
+            <div>Implementation Verified</div>
+            <div style="font-size: 0.8rem; font-weight: 400; color: #a7f3d0;">Both 128-hexadecimal digests are 100% identical bit-for-bit.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==============================================================================
+         SECTION 8: TEST VECTORS
+         ============================================================================== -->
+    <section id="test-vectors" class="section-block">
+      <div class="section-header">
+        <div class="section-title-wrap">
+          <div class="section-icon">🧪</div>
+          <div>
+            <h2 class="section-title">Standard Test Vectors</h2>
+            <p class="section-subtitle">Official NIST &amp; RFC 6234 standard test vector validation suite</p>
+          </div>
+        </div>
+        <button id="btn-run-all-tests" class="btn btn-primary btn-sm" type="button">
+          <span>▶️</span> Run All Test Vectors
+        </button>
+      </div>
+
+      <div class="card">
+        <h3 class="card-title">Known SHA-512 Test Vectors</h3>
+        <p class="card-description">
+          Verification against standard cryptographic test vectors from NIST FIPS 180-4. All test cases compare our manual engine against the reference output.
+        </p>
+
+        <div class="table-responsive">
+          <table class="test-table">
+            <thead>
+              <tr>
+                <th style="width: 50px;">#</th>
+                <th style="width: 140px;">Test Description</th>
+                <th>Input Sample</th>
+                <th>Our SHA-512 Digest (Prefix)</th>
+                <th>Reference Digest (Prefix)</th>
+                <th style="width: 100px; text-align: center;">Result</th>
+              </tr>
+            </thead>
+            <tbody id="test-vectors-tbody">
+              <!-- Dynamically Populated by script.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="test-summary-box" style="margin-top: 1rem; padding: 0.75rem 1rem; background: rgba(31, 41, 55, 0.4); border-radius: var(--radius-sm); display: flex; justify-content: space-between; align-items: center; font-size: 0.875rem;">
+          <span id="test-summary-text">Ready to run 6 standard test vector suites.</span>
+          <span id="test-summary-badge" class="badge-pass" style="display: none;">ALL TESTS PASSED ✓</span>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==============================================================================
+       FOOTER
+       ============================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      <p class="footer-text">
+        <strong>SHA-512 Cryptographic Hash Function</strong> &bull; College Cryptography Mini Project
+      </p>
+      <p class="footer-sub">
+        Implemented using HTML5, CSS3, and Vanilla JavaScript (64-bit BigInt). Zero external libraries.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Toast Feedback Element -->
+  <div id="toast" class="toast">
+    <span id="toast-icon">📋</span>
+    <span id="toast-msg">Hash copied to clipboard!</span>
+  </div>
+
+  <!-- Scripts -->
+  <script src="sha512.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
